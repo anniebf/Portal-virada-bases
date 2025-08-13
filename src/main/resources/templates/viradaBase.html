@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Ambientes</title>
+    <style>
+        :root {
+            --homologacao: #4e79a7;
+            --debug: #f28e2b;
+            --amb1: #e15759;
+            --amb2: #76b7b2;
+            --amb3: #59a14f;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn.active {
+            transform: translateY(0);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+        }
+        
+        #homologacao { background-color: var(--homologacao); }
+        #debug { background-color: var(--debug); }
+        #amb1 { background-color: var(--amb1); }
+        #amb2 { background-color: var(--amb2); }
+        #amb3 { background-color: var(--amb3); }
+        
+        .calendar {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .month-header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .month-title {
+            flex-grow: 1;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+            position: relative;
+            font-weight: 500;
+        }
+        
+        .day.empty {
+            background-color: transparent;
+            box-shadow: none;
+        }
+        
+        .day.today {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: bold;
+        }
+        
+        .day.highlighted {
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+        
+        .day.homologacao { background-color: var(--homologacao); }
+        .day.debug { background-color: var(--debug); }
+        .day.amb1 { background-color: var(--amb1); }
+        .day.amb2 { background-color: var(--amb2); }
+        .day.amb3 { background-color: var(--amb3); }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .month-nav {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #2c3e50;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .month-nav:hover {
+            background-color: #f0f0f0;
+        }
+        
+        @media (max-width: 600px) {
+            .btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .day {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendário de Virada das Bases</h1>
+    
+    <div class="controls">
+        <button id="homologacao" class="btn">Homologação</button>
+        <button id="debug" class="btn">Debug</button>
+        <button id="amb1" class="btn">Ambiente 1</button>
+        <button id="amb2" class="btn">Ambiente 2</button>
+        <button id="amb3" class="btn">Ambiente 3</button>
+    </div>
+    
+    <div class="calendar">
+        <div class="month-header">
+            <button class="month-nav" id="prev-month">❮</button>
+            <div class="month-title" id="current-month">Junho 2023</div>
+            <button class="month-nav" id="next-month">❯</button>
+        </div>
+        
+        <div class="weekdays">
+            <div>Dom</div>
+            <div>Seg</div>
+            <div>Ter</div>
+            <div>Qua</div>
+            <div>Qui</div>
+            <div>Sex</div>
+            <div>Sáb</div>
+        </div>
+        
+        <div class="days" id="calendar-days"></div>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--homologacao);"></div>
+            <span>Homologação</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--debug);"></div>
+            <span>Debug</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--amb1);"></div>
+            <span>Ambiente 1</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--amb2);"></div>
+            <span>Ambiente 2</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--amb3);"></div>
+            <span>Ambiente 3</span>
+        </div>
+    </div>
+    
+    <script>
+        // Configuração inicial
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        const today = new Date();
+        
+        // Datas fixas para cada ambiente (2 por botão)
+        const environmentDates = {
+            homologacao: ['2023-06-05', '2023-06-20'],
+            debug: ['2023-06-08', '2023-06-22'],
+            amb1: ['2023-05-10', '2023-05-25'],
+            amb2: ['2023-06-12', '2023-06-27'],
+            amb3: ['2023-07-03', '2023-07-18']
+        };
+        
+        // Mapeamento de meses para nomes
+        const monthNames = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+        
+        // Atualizar o calendário
+        function updateCalendar() {
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            document.getElementById('current-month').textContent = 
+                `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            
+            // Dias vazios no início
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day empty';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Dias do mês
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = day;
+                dayElement.dataset.date = formatDate(date);
+                
+                // Verificar se é hoje
+                if (date.getDate() === today.getDate() && 
+                    date.getMonth() === today.getMonth() && 
+                    date.getFullYear() === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                }
+                
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Reaplicar o highlight se houver um ambiente ativo
+            const activeBtn = document.querySelector('.btn.active');
+            if (activeBtn) {
+                highlightEnvironment(activeBtn.id);
+            }
+        }
+        
+        // Formatar data como YYYY-MM-DD
+        function formatDate(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+        
+        // Extrair mês e ano de uma data no formato YYYY-MM-DD
+        function getMonthYearFromDate(dateStr) {
+            const parts = dateStr.split('-');
+            return {
+                year: parseInt(parts[0]),
+                month: parseInt(parts[1]) - 1
+            };
+        }
+        
+        // Destacar datas de um ambiente específico
+        function highlightEnvironment(env) {
+            // Remover todas as classes de highlight
+            document.querySelectorAll('.day').forEach(day => {
+                day.classList.remove('highlighted', 'homologacao', 'debug', 'amb1', 'amb2', 'amb3');
+            });
+            
+            // Verificar se todas as datas estão no mesmo mês
+            const dates = environmentDates[env];
+            const firstDate = getMonthYearFromDate(dates[0]);
+            
+            // Mudar para o mês da primeira data se não for o mês atual
+            if (firstDate.month !== currentMonth || firstDate.year !== currentYear) {
+                currentMonth = firstDate.month;
+                currentYear = firstDate.year;
+                updateCalendar();
+            }
+            
+            // Adicionar classes para as datas do ambiente selecionado
+            dates.forEach(dateStr => {
+                const dateInfo = getMonthYearFromDate(dateStr);
+                if (dateInfo.month === currentMonth && dateInfo.year === currentYear) {
+                    const dayElement = document.querySelector(`.day[data-date="${dateStr}"]`);
+                    if (dayElement) {
+                        dayElement.classList.add('highlighted', env);
+                    }
+                }
+            });
+        }
+        
+        // Inicializar
+        updateCalendar();
+        
+        // Configurar eventos dos botões
+        document.getElementById('homologacao').addEventListener('click', () => {
+            highlightEnvironment('homologacao');
+            setActiveButton('homologacao');
+        });
+        
+        document.getElementById('debug').addEventListener('click', () => {
+            highlightEnvironment('debug');
+            setActiveButton('debug');
+        });
+        
+        document.getElementById('amb1').addEventListener('click', () => {
+            highlightEnvironment('amb1');
+            setActiveButton('amb1');
+        });
+        
+        document.getElementById('amb2').addEventListener('click', () => {
+            highlightEnvironment('amb2');
+            setActiveButton('amb2');
+        });
+        
+        document.getElementById('amb3').addEventListener('click', () => {
+            highlightEnvironment('amb3');
+            setActiveButton('amb3');
+        });
+        
+        // Navegação entre meses
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendar();
+        });
+        
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        });
+        
+        // Manter controle do botão ativo
+        function setActiveButton(env) {
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(env).classList.add('active');
+        }
+        
+        // Destacar Homologação por padrão
+        highlightEnvironment('homologacao');
+        setActiveButton('homologacao');
+    </script>
+</body>
+</html>
