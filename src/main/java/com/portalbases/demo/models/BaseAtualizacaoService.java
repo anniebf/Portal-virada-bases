@@ -23,7 +23,7 @@ public class BaseAtualizacaoService {
 
     public List<BaseAtualizacao> carregarBases() {
         List<BaseAtualizacao> bases = new ArrayList<>();
-        Path caminho = Paths.get("src/main/resources/bases/saida.csv");
+        Path caminho = Paths.get("S:/Portal_Virada_Bases/PortalViradaBases/src/main/resources/bases/saida.csv");
         File file = caminho.toFile();
 
         System.out.println("Tentando acessar: " + file.getAbsolutePath());

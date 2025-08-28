@@ -31,7 +31,7 @@ public class ManipuladorCSV {
         aliases.put("AMB3", "AMB3LNX");
         aliases.put("AMB4", "AMB4LNX");
         aliases.put("AMB5", "AMB5LNX");
-        aliases.put("DEVBF", "DEVBF2LNX");
+        aliases.put("DEVBF", "DEVBFLNX");
         aliases.put("DEVBF2", "DEVBF2LNX");
         aliases.put("RMFOLHA", "RMFOLHA");
 

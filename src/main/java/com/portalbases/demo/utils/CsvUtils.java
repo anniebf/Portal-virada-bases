@@ -9,7 +9,6 @@ public class CsvUtils {
         return value == null ? null : value.trim().replaceAll("^\"|\"$", "");
     }
 
-
     public static LocalDate parseDate(String dateStr) {
         if (dateStr == null || dateStr.isEmpty() || dateStr.equalsIgnoreCase("N/A")) {
             return null;

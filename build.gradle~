@@ -47,7 +47,6 @@ sourceSets {
             include '**/*.js'
             include '**/*.png'
             include '**/*.p12'  // ADICIONE ESTA LINHA
-			include '**/*.pfx'
 			include '**/*.properties'
         }
     }
